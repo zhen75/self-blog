@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <title th:text="#{form.pageTitle}">Article editor · Personal Blog</title>
+  <link th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="bg-light min-vh-100">
+<div th:replace="~{fragments :: adminNav}"></div>
+<main class="container py-5">
+  <div class="row justify-content-center"><div class="col-xl-10">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div><a class="text-decoration-none small" th:href="@{/admin}" th:text="#{form.back}">← Back</a><h1 class="h2 fw-bold mt-2 mb-0" th:text="${editing} ? #{form.edit} : #{form.new}">New article</h1></div>
+      <span th:if="${editing}" class="badge fs-6" th:classappend="${post.status.name() == 'published'} ? 'text-bg-success' : 'text-bg-warning'" th:text="${post.status.name() == 'published'} ? #{status.published} : #{status.draft}">Draft</span>
+    </div>
+    <div th:if="${editing and post.status.name() == 'published'}" class="alert alert-info" th:text="#{form.publishedNotice}">Withdraw before editing.</div>
+    <form class="card border-0 shadow-sm needs-validation" id="article-form" novalidate th:data-mode="${editing} ? 'edit' : 'create'" th:data-post-id="${post.id}"
+          th:data-request-failed="#{common.requestFailed}" th:data-publish-question="#{js.publishNewQuestion}"
+          th:data-saving="#{js.saving}" th:data-publishing="#{js.publishing}" th:data-saved="#{js.saved}"
+          th:data-delete-question="#{js.deleteQuestion}" th:data-deleting="#{js.deleting}">
+      <div class="card-body p-4 p-lg-5">
+        <input type="hidden" id="post-id" th:value="${post.id}">
+        <div class="mb-4">
+          <label for="title" class="form-label fw-semibold" th:text="#{form.title}">Title</label>
+          <input class="form-control form-control-lg" id="title" name="title" maxlength="100" required th:placeholder="#{form.titlePlaceholder}" th:value="${post.title}" th:disabled="${editing and post.status.name() == 'published'}">
+          <div class="invalid-feedback" th:text="#{form.titleInvalid}">Enter a title.</div>
+          <div class="form-text" th:text="#{form.titleHelp}">Maximum 100 characters.</div>
+        </div>
+        <div class="mb-4">
+          <label for="content" class="form-label fw-semibold" th:text="#{form.content}">Markdown content</label>
+          <textarea class="form-control font-monospace" id="content" name="content" rows="18" required th:placeholder="#{form.contentPlaceholder}" th:text="${post.content}" th:disabled="${editing and post.status.name() == 'published'}"></textarea>
+          <div class="invalid-feedback" th:text="#{form.contentInvalid}">Enter content.</div>
+          <div class="form-text" th:text="#{form.contentHelp}">Markdown syntax help.</div>
+        </div>
+        <div id="form-message" class="alert d-none" role="alert"></div>
+        <div class="d-flex justify-content-between gap-3 border-top pt-4">
+          <button th:if="${editing}" id="delete-post" class="btn btn-outline-danger" type="button" th:data-post-title="${post.title}" th:data-default-label="#{action.delete}" th:text="#{action.delete}">Delete</button>
+          <div class="ms-auto d-flex flex-wrap justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" th:href="@{/admin}" th:text="#{action.cancel}">Cancel</a>
+            <button id="save-post" class="btn btn-outline-primary" type="submit" data-intent="save" th:disabled="${editing and post.status.name() == 'published'}" th:text="${editing} ? #{action.saveChanges} : #{action.saveDraft}">Save draft</button>
+            <button th:unless="${editing}" id="publish-post" class="btn btn-primary" type="submit" data-intent="publish" th:text="#{action.publishArticle}">Publish article</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div></div>
+</main>
+<script th:src="@{/js/article-form.js}"></script>
+</body>
+</html>

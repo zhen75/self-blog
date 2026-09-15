@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <title th:text="#{admin.title} + ' · Personal Blog'">Article management · Personal Blog</title>
+  <link th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="bg-light min-vh-100">
+<div th:replace="~{fragments :: adminNav}"></div>
+<main id="admin-page" class="container py-5"
+      th:data-request-failed="#{common.requestFailed}"
+      th:data-publish-question="#{js.publishQuestion}"
+      th:data-withdraw-question="#{js.withdrawQuestion}"
+      th:data-delete-question="#{js.deleteQuestion}"
+      th:data-publishing="#{js.publishing}" th:data-withdrawing="#{js.withdrawing}" th:data-deleting="#{js.deleting}"
+      th:data-published="#{js.published}" th:data-withdrawn="#{js.withdrawn}" th:data-deleted="#{js.deleted}">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div><p class="text-primary fw-semibold mb-1">CONTENT</p><h1 class="h2 fw-bold mb-1" th:text="#{admin.title}">Article management</h1><p class="text-secondary mb-0" th:text="#{admin.description}">Manage articles.</p></div>
+    <a class="btn btn-primary" th:href="@{/admin/articles/new}" th:text="#{admin.new}">＋ New article</a>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-secondary small" th:text="#{admin.total}">All articles</div><div class="fs-2 fw-bold" th:text="${totalCount}">0</div></div></div></div>
+    <div class="col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-secondary small" th:text="#{admin.drafts}">Drafts</div><div class="fs-2 fw-bold text-warning" th:text="${draftCount}">0</div></div></div></div>
+    <div class="col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-secondary small" th:text="#{admin.published}">Published</div><div class="fs-2 fw-bold text-success" th:text="${publishedCount}">0</div></div></div></div>
+  </div>
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white p-3 d-flex flex-column flex-sm-row justify-content-between gap-3">
+      <h2 class="h5 mb-0 align-self-sm-center" th:text="#{admin.list}">Article list</h2>
+      <div class="btn-group btn-group-sm" role="group" th:attr="aria-label=#{admin.filterLabel}">
+        <a class="btn" th:classappend="${activeStatus == null} ? 'btn-dark' : 'btn-outline-dark'" th:href="@{/admin}" th:text="#{admin.all}">All</a>
+        <a class="btn" th:classappend="${activeStatus != null and activeStatus.name() == 'draft'} ? 'btn-dark' : 'btn-outline-dark'" th:href="@{/admin(status='draft')}" th:text="#{admin.drafts}">Drafts</a>
+        <a class="btn" th:classappend="${activeStatus != null and activeStatus.name() == 'published'} ? 'btn-dark' : 'btn-outline-dark'" th:href="@{/admin(status='published')}" th:text="#{admin.published}">Published</a>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light"><tr><th class="ps-3" th:text="#{admin.article}">Article</th><th th:text="#{admin.status}">Status</th><th th:text="#{admin.created}">Created</th><th class="text-end pe-3" th:text="#{admin.actions}">Actions</th></tr></thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(posts)}"><td colspan="4" class="text-center text-secondary py-5" th:text="#{admin.empty}">No articles.</td></tr>
+          <tr th:each="post : ${posts}">
+            <td class="ps-3"><div class="fw-semibold" th:text="${post.title}">Title</div><div class="small text-secondary" th:text="#{admin.id(${post.id})}">ID</div></td>
+            <td><span class="badge" th:classappend="${post.status.name() == 'published'} ? 'text-bg-success' : 'text-bg-warning'" th:text="${post.status.name() == 'published'} ? #{status.published} : #{status.draft}">Draft</span></td>
+            <td class="text-secondary small" th:text="${post.createdAt != null ? post.createdAt.toLocalDate() : '—'}">—</td>
+            <td class="text-end pe-3 text-nowrap">
+              <a class="btn btn-sm btn-outline-primary" th:href="@{/admin/articles/{id}/edit(id=${post.id})}" th:text="#{action.edit}">Edit</a>
+              <button th:if="${post.status.name() == 'draft'}" class="btn btn-sm btn-success js-post-action" type="button" data-action="publish" th:data-post-id="${post.id}" th:data-post-title="${post.title}" th:text="#{action.publish}">Publish</button>
+              <a th:if="${post.status.name() == 'published'}" class="btn btn-sm btn-outline-secondary" th:href="@{/articles/{id}(id=${post.id})}" target="_blank" th:text="#{action.view}">View</a>
+              <button th:if="${post.status.name() == 'published'}" class="btn btn-sm btn-warning js-post-action" type="button" data-action="withdraw" th:data-post-id="${post.id}" th:data-post-title="${post.title}" th:text="#{action.withdraw}">Withdraw</button>
+              <button class="btn btn-sm btn-outline-danger js-post-action" type="button" data-action="delete" th:data-post-id="${post.id}" th:data-post-title="${post.title}" th:text="#{action.delete}">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="admin-toast" class="toast align-items-center border-0" role="status" aria-live="polite" aria-atomic="true">
+    <div class="d-flex"><div class="toast-body"></div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" th:attr="aria-label=#{action.close}"></button></div>
+  </div>
+</div>
+<script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

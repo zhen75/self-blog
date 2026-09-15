@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: blog
+  datasource:
+    url: ${BLOG_DB_URL:jdbc:mysql://localhost:3306/blog}
+    username: ${BLOG_DB_USERNAME:bloguser}
+    password: ${BLOG_DB_PASSWORD}
+
+blog:
+  admin:
+    username: ${BLOG_ADMIN_USERNAME:admin}
+    password: ${BLOG_ADMIN_PASSWORD}
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  servlet:
+    session:
+      timeout: 7d
+      cookie:
+        http-only: true
+        same-site: lax
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false

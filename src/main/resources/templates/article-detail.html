@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|${post.title} · Personal Blog|">Article · Personal Blog</title>
+    <link th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<div th:replace="~{fragments :: publicNav}"></div>
+<main class="container py-5 flex-grow-1">
+    <article class="article-container mx-auto">
+        <a class="text-decoration-none" th:href="@{/}" th:text="#{detail.back}">← Back to articles</a>
+        <header class="py-4 border-bottom">
+            <span class="badge text-bg-primary mb-3" th:text="#{detail.published}">Published</span>
+            <h1 class="display-5 fw-bold" th:text="${post.title}">Article title</h1>
+            <div class="d-flex flex-wrap gap-3 text-secondary mt-3 small">
+                <span th:if="${post.createdAt != null}" th:text="#{detail.publishedOn(${post.createdAt.toLocalDate()})}">Published date</span>
+                <span th:if="${post.updatedAt != null}" th:text="#{detail.updatedOn(${post.updatedAt.toLocalDate()})}">Updated date</span>
+            </div>
+        </header>
+        <div class="bg-white border rounded-3 p-4 p-md-5 mt-4 shadow-sm">
+            <p class="lead text-secondary border-start border-4 border-primary ps-3" th:if="${post.summary != null and !post.summary.isBlank()}" th:text="${post.summary}">Article summary</p>
+            <div class="markdown-body fs-5 lh-lg" th:utext="${postHtml}">Article content</div>
+        </div>
+    </article>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

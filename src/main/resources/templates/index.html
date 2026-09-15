@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Personal Blog</title>
+    <link th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/site.css}" rel="stylesheet">
+</head>
+<body class="bg-light d-flex flex-column min-vh-100">
+<div th:replace="~{fragments :: publicNav}"></div>
+
+<header class="bg-dark text-white">
+    <div class="container py-5">
+        <div class="row py-lg-4">
+            <div class="col-lg-8">
+                <p class="text-uppercase text-info fw-semibold small mb-3" th:text="#{home.eyebrow}">PERSONAL JOURNAL</p>
+                <h1 class="display-4 fw-bold mb-3" th:text="#{home.title}">Ideas, lessons, and a record of growth.</h1>
+                <p class="lead text-white-50 mb-0" th:text="#{home.subtitle}">Long-form notes.</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container py-5 flex-grow-1">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <p class="text-primary fw-semibold mb-1" th:text="#{home.latest}">LATEST WRITING</p>
+            <h2 class="fw-bold mb-0" th:text="#{home.latestTitle}">Latest articles</h2>
+        </div>
+        <span class="text-secondary small" th:text="#{home.count(${result.total()})}">0 articles</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(result.posts())}" class="bg-white border rounded-3 p-5 text-center">
+        <h3 class="h5" th:text="#{home.emptyTitle}">No published articles yet</h3>
+        <p class="text-secondary mb-0" th:text="#{home.emptyText}">The first story is on its way.</p>
+    </div>
+
+    <div class="row g-4" th:unless="${#lists.isEmpty(result.posts())}">
+        <div class="col-12 col-md-6" th:each="post : ${result.posts()}">
+            <article class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between gap-3 mb-3">
+                        <span class="badge rounded-pill text-bg-light border" th:text="#{home.article}">ARTICLE</span>
+                        <time class="small text-secondary" th:text="${post.createdAt() != null ? post.createdAt().toLocalDate() : ''}">2026-09-09</time>
+                    </div>
+                    <h3 class="h4 fw-bold">
+                        <a class="text-dark text-decoration-none stretched-link" th:href="@{/articles/{id}(id=${post.id()})}" th:text="${post.title()}">Article title</a>
+                    </h3>
+                    <p class="text-secondary mb-0" th:text="${post.summary()}">Article summary</p>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <nav class="mt-5" th:if="${totalPages > 1}" th:attr="aria-label=#{pagination.label}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${result.page() == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/(page=${result.page() - 1})}" th:text="#{pagination.previous}">Previous</a>
+            </li>
+            <li class="page-item" th:each="number : ${#numbers.sequence(1, totalPages)}" th:classappend="${number == result.page()} ? 'active'">
+                <a class="page-link" th:href="@{/(page=${number})}" th:text="${number}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${result.page() == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/(page=${result.page() + 1})}" th:text="#{pagination.next}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

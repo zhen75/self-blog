@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.toLanguageTag()}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="publicNav" class="navbar bg-white border-bottom sticky-top">
+    <div class="container py-2">
+        <a class="navbar-brand fw-bold" th:href="@{/}">Personal Blog</a>
+        <div class="d-flex align-items-center gap-3">
+            <a class="text-decoration-none text-secondary" th:href="@{/}" th:text="#{nav.articles}">Articles</a>
+            <a th:if="${isAuthenticated}" class="btn btn-outline-dark btn-sm" th:href="@{/admin}" th:text="#{nav.admin}">Dashboard</a>
+            <div class="btn-group btn-group-sm" th:attr="aria-label=#{nav.language}">
+                <a class="btn btn-outline-secondary" th:classappend="${#locale.language == 'en'} ? 'active'" href="?lang=en">EN</a>
+                <a class="btn btn-outline-secondary" th:classappend="${#locale.language == 'zh'} ? 'active'" href="?lang=zh_CN">中文</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<nav th:fragment="adminNav" class="navbar navbar-dark bg-dark sticky-top">
+    <div class="container py-2">
+        <a class="navbar-brand fw-semibold" th:href="@{/admin}">Personal Blog · Admin</a>
+        <div class="d-flex align-items-center gap-2">
+            <a class="btn btn-outline-light btn-sm" th:href="@{/}" target="_blank" th:text="#{nav.viewBlog}">View blog</a>
+            <div class="btn-group btn-group-sm" th:attr="aria-label=#{nav.language}">
+                <a class="btn btn-outline-light" th:classappend="${#locale.language == 'en'} ? 'active'" href="?lang=en">EN</a>
+                <a class="btn btn-outline-light" th:classappend="${#locale.language == 'zh'} ? 'active'" href="?lang=zh_CN">中文</a>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button class="btn btn-light btn-sm" type="submit" th:text="#{nav.logout}">Log out</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<footer th:fragment="footer" class="border-top bg-white mt-auto">
+    <div class="container py-4 d-flex flex-column flex-sm-row justify-content-between gap-2 text-secondary small">
+        <span>© 2026 Personal Blog</span>
+        <span th:text="#{footer.tagline}">Thoughts, notes and things worth keeping.</span>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,16 @@
+server:
+  address: 127.0.0.1
+  forward-headers-strategy: native
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+spring:
+  thymeleaf:
+    cache: true
+
+logging:
+  level:
+    root: INFO
+    com.example.selfblog: INFO
